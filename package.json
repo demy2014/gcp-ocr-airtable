@@ -1,0 +1,29 @@
+{
+  "name": "gcp-ocr-airtable",
+  "version": "1.0.0",
+  "description": "Bulk image upload with OCR processing using Google Vision and Airtable integration",
+  "main": "backend/index.js",
+  "scripts": {
+    "start": "node backend/index.js",
+    "dev": "nodemon backend/index.js",
+    "deploy": "gcloud functions deploy upload --runtime nodejs18 --trigger-http --allow-unauthenticated"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^5.11.0",
+    "@google-cloud/vision": "^3.0.0",
+    "airtable": "^0.11.0",
+    "express": "^4.17.1",
+    "multer": "^1.4.3",
+    "dotenv": "^16.0.0",
+    "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "eslint": "^8.17.0",
+    "prettier": "^2.7.1"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "license": "MIT"
+}
+

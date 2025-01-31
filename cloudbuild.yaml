@@ -1,0 +1,51 @@
+# Cloud Build configuration for deploying to Google Cloud Functions
+steps:
+  # Step 1: Install dependencies
+  - name: 'gcr.io/cloud-builders/npm'
+    id: 'Install dependencies'
+    entrypoint: 'npm'
+    args: ['install']
+    dir: './backend'  # Make sure to point to the directory where your Node.js project is
+
+  # Step 2: Run tests (optional)
+  - name: 'gcr.io/cloud-builders/npm'
+    id: 'Run tests'
+    entrypoint: 'npm'
+    args: ['test']
+    dir: './backend'
+
+  # Step 3: Deploy the backend as a Google Cloud Function
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy to Google Cloud Function'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud functions deploy upload \
+        --runtime nodejs18 \
+        --trigger-http \
+        --allow-unauthenticated \
+        --region=asia-southeast1 \
+        --entry-point=app \
+        --env-vars-file .env  # Make sure your .env is properly configured
+
+  # Optional: Step 4 for deploying to Google Cloud Run (if you prefer this)
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build Docker Image'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-ocr-project-airtable', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Deploy to Cloud Run'
+    args: [
+      'run', 'deploy', 'gcp-ocr-airtable',
+      '--image', 'gcr.io/$PROJECT_ID/my-ocr-project-airtable',
+      '--platform', 'managed',
+      '--region', 'asia-southeast1',
+      '--allow-unauthenticated'
+    ]
+  
+timeout: 1200s  # Optional: adjust based on expected deployment time
+
+images:
+  - 'gcr.io/$PROJECT_ID/my-gcp-ocr-airtable'
+
